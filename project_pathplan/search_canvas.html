@@ -73,10 +73,10 @@ function init() {
 function initSearch() {
 
     // specify default search algorithm to use for planning
-    //search_alg = "depth-first";  
+    search_alg = "depth-first";  
     //search_alg = "breadth-first";  
     //search_alg = "greedy-best-first";  
-    search_alg = "A-star";  
+    //search_alg = "A-star";  
     //search_alg = "RRT";  
     //search_alg = "RRT-connect";  
     //search_alg = "RRT-star";  
@@ -88,6 +88,16 @@ function initSearch() {
     //planning_scene = "narrow1";
     //planning_scene = "narrow2";
     //planning_scene = "three_sections";
+
+
+/////////////////////////
+// Please Select Distance Measurement Method and Neighbor visiting order for DFS and RFS
+////////////////////////
+    //distance_measure = "Euclidean";
+    distance_measure = "Manhatan";
+    //distance_measure = "Chebyshev"
+    neighbor_order_ij = [[1,0],[0,1],[-1,0],[0,-1]];
+
 
     // specify default eps (epsilon) spatial resolution variable
     //   for RRT, specifies threshold radius for step size and reaching goal
@@ -223,7 +233,9 @@ function animate() {
 
         // call iteration for the selected search algorithm
         switch (search_alg) {
-            case "depth-first": 
+            case "depth-first":
+                search_result = iterateGraphSearch();
+                break; 
             case "breadth-first": 
             case "greedy-best-first": 
             case "A-star": 
@@ -274,6 +286,7 @@ function animate() {
 }
 
 function iterateGraphSearch() {
+  
 
 
     // STENCIL: implement a single iteration of a graph search algorithm
@@ -290,6 +303,30 @@ function iterateGraphSearch() {
     //   testCollision - returns whether a given configuration is in collision
     //   drawHighlightedPathGraph - draws a path back to the start location
     //   draw_2D_configuration - draws a square at a given location 
+    if(visit_queue.length == 0){
+        return "failed";
+    }
+
+    var current_node = pop(visit_queue);
+    if(current_node.xpos == q_goal[0] && current_node.ypos == q.goal[1]){
+        drawHighlightedPathGraph(current_node);
+        return "succeeded";
+    }
+    current_node.visited = true;
+    for(var i = 0;i < 4;i++){
+        var iind_nbr = current_node.iind + neighbor_order_ij[i][0];
+        var jind_nbr = current_node.jind + neighbor_order_ij[i][1];
+        var nbr_node = G[iind_nbr][jind_nbr];
+        if(!testCollision(nbr_node.xpos, nbr_node.ypos) && !nbr_node.visited && !nbr_node.queued){
+            push(visit_queue,nbr_node);
+            nbr_node.queued = true;
+            draw_2D_configuration(nbr_node.xpos, nbr_node.ypos);
+            if(nbr_node.distance > current_node.distance + distance(current_node,nbr_node)){
+                nbr_node.distance = current_node.distance + distance(current_node,nbr_node);
+                nbr_node.parent = current_node;
+            }
+        }
+    }
 }
 
 
@@ -340,6 +377,42 @@ function iterateRRTStar() {
 //////////////////////////////////////////////////
 /////     STENCIL SUPPORT FUNCTIONS
 //////////////////////////////////////////////////
+
+// distance calculation
+function distance(g1,g2){
+    switch(distance_measure){
+        case "Euclidean":
+            return (Math.sqrt(Math.pow(g1.xpos - g2.xpos,2) + Math.pow(g1.ypos - g2.ypos),2))
+        case "Manhattan":
+            return (Math.abs(g1.xpos - g2.xpos) + Math.abs(g1.ypos - g2.ypos));
+        case "Chebyshev":
+            return (Math.max(Math.abs(g1.xpos - g2.xpos) , Math.abs(g1.ypos - g2.ypos)));
+        default:
+            console.warn('distance method not found.');
+            return 0;
+    }
+}
+
+// push operation for the visit list.
+// normal push for DFS and BFS
+// heap operation for A-star
+function push(visit_queue,g){
+    switch(search_alg){
+        case "depth-first":
+            visit_queue.push(g);
+        case "breadth-first":
+            visit_queue.push(g);
+    }
+}
+
+function pop(visit_queue){
+    switch(search_alg){
+        case "depth-first":
+            return visit_queue.pop();
+        case "breadth-first":
+            return visit_queue.shift();
+    }
+}
 
 // functions for transforming canvas coordinates into planning world coordinates
 function xformWorldViewX(world_x) {
@@ -430,8 +503,17 @@ function initSearchGraph() {
 
             // STENCIL: determine whether this graph node should be the start
             //   point for the search
-                visit_queue = [];
+            console.warn(xpos + "and" + ypos);
+            if(xpos == q_init[0] && ypos == q_init[1]){
+                console.warn("find start");
+                G[iind][jind].distance = 0;
+                push(visit_queue,G[iind][jind]);
+            }
+            //    visit_queue = [];
         }
+    }
+    if(visit_queue.length == 0){
+        console.warn("start point not on the graph, choose another eps");
     }
 }
 
