@@ -73,8 +73,8 @@ function init() {
 function initSearch() {
 
     // specify default search algorithm to use for planning
-    search_alg = "depth-first";  
-    //search_alg = "breadth-first";  
+    // search_alg = "depth-first";  
+    search_alg = "breadth-first";  
     //search_alg = "greedy-best-first";  
     //search_alg = "A-star";  
     //search_alg = "RRT";  
@@ -84,8 +84,8 @@ function initSearch() {
     // specify default the world for the planner 
     //  (stored as "range" global variable with name "planning_scene")
     //planning_scene = "empty";
-    planning_scene = "misc";
-    //planning_scene = "narrow1";
+    // planning_scene = "misc";
+    planning_scene = "narrow1";
     //planning_scene = "narrow2";
     //planning_scene = "three_sections";
 
@@ -93,8 +93,8 @@ function initSearch() {
 /////////////////////////
 // Please Select Distance Measurement Method and Neighbor visiting order for DFS and RFS
 ////////////////////////
-    //distance_measure = "Euclidean";
-    distance_measure = "Manhatan";
+    distance_measure = "Euclidean";
+    // distance_measure = "Manhattan";
     //distance_measure = "Chebyshev"
     neighbor_order_ij = [[1,0],[0,1],[-1,0],[0,-1]];
 
@@ -282,6 +282,9 @@ function animate() {
 
     // callback request for the animate function be called again
     //   more details online:  http://learningwebgl.com/blog/?p=3189
+    if(search_result == "succeeded"){
+        return;
+    }
     requestAnimationFrame( animate );
 }
 
@@ -308,25 +311,27 @@ function iterateGraphSearch() {
     }
 
     var current_node = pop(visit_queue);
-    if(current_node.xpos == q_goal[0] && current_node.ypos == q.goal[1]){
+    if(isEqual(current_node.x,q_goal[0]) && isEqual(current_node.y,q_goal[1])){
         drawHighlightedPathGraph(current_node);
         return "succeeded";
     }
     current_node.visited = true;
     for(var i = 0;i < 4;i++){
-        var iind_nbr = current_node.iind + neighbor_order_ij[i][0];
-        var jind_nbr = current_node.jind + neighbor_order_ij[i][1];
+        var iind_nbr = current_node.i + neighbor_order_ij[i][0];
+        var jind_nbr = current_node.j + neighbor_order_ij[i][1];
         var nbr_node = G[iind_nbr][jind_nbr];
-        if(!testCollision(nbr_node.xpos, nbr_node.ypos) && !nbr_node.visited && !nbr_node.queued){
+        if(!testCollision([nbr_node.x, nbr_node.y]) && !nbr_node.visited && !nbr_node.queued){
+            console.warn('found neighbor');
             push(visit_queue,nbr_node);
             nbr_node.queued = true;
-            draw_2D_configuration(nbr_node.xpos, nbr_node.ypos);
+            draw_2D_configuration([nbr_node.x, nbr_node.y]);
             if(nbr_node.distance > current_node.distance + distance(current_node,nbr_node)){
                 nbr_node.distance = current_node.distance + distance(current_node,nbr_node);
                 nbr_node.parent = current_node;
             }
         }
     }
+    return "iterating";
 }
 
 
@@ -382,15 +387,19 @@ function iterateRRTStar() {
 function distance(g1,g2){
     switch(distance_measure){
         case "Euclidean":
-            return (Math.sqrt(Math.pow(g1.xpos - g2.xpos,2) + Math.pow(g1.ypos - g2.ypos),2))
+            return (Math.sqrt(Math.pow(g1.x - g2.x,2) + Math.pow(g1.y - g2.y,2)))
         case "Manhattan":
-            return (Math.abs(g1.xpos - g2.xpos) + Math.abs(g1.ypos - g2.ypos));
+            return (Math.abs(g1.x - g2.x) + Math.abs(g1.y - g2.y));
         case "Chebyshev":
-            return (Math.max(Math.abs(g1.xpos - g2.xpos) , Math.abs(g1.ypos - g2.ypos)));
+            return (Math.max(Math.abs(g1.x - g2.x) , Math.abs(g1.y - g2.y)));
         default:
             console.warn('distance method not found.');
             return 0;
     }
+}
+
+function isEqual(a,b){
+    return Math.abs(a-b)<0.000001;
 }
 
 // push operation for the visit list.
@@ -503,8 +512,8 @@ function initSearchGraph() {
 
             // STENCIL: determine whether this graph node should be the start
             //   point for the search
-            console.warn(xpos + "and" + ypos);
-            if(xpos == q_init[0] && ypos == q_init[1]){
+            // console.warn(xpos + "and" + ypos);
+            if(isEqual(xpos,q_init[0]) && isEqual(ypos,q_init[1])){
                 console.warn("find start");
                 G[iind][jind].distance = 0;
                 push(visit_queue,G[iind][jind]);
