@@ -73,8 +73,8 @@ function init() {
 function initSearch() {
 
     // specify default search algorithm to use for planning
-    // search_alg = "depth-first";  
-    search_alg = "breadth-first";  
+    search_alg = "depth-first";  
+    // search_alg = "breadth-first";  
     //search_alg = "greedy-best-first";  
     //search_alg = "A-star";  
     //search_alg = "RRT";  
@@ -316,13 +316,16 @@ function iterateGraphSearch() {
         return "succeeded";
     }
     current_node.visited = true;
+    search_visited++;
     for(var i = 0;i < 4;i++){
         var iind_nbr = current_node.i + neighbor_order_ij[i][0];
         var jind_nbr = current_node.j + neighbor_order_ij[i][1];
         var nbr_node = G[iind_nbr][jind_nbr];
-        if(!testCollision([nbr_node.x, nbr_node.y]) && !nbr_node.visited && !nbr_node.queued){
-            console.warn('found neighbor');
-            push(visit_queue,nbr_node);
+        if(!testCollision([nbr_node.x, nbr_node.y]) && !nbr_node.visited){
+            // console.warn('found neighbor');
+            if(!nbr_node.queued){
+                push(visit_queue,nbr_node);
+            }
             nbr_node.queued = true;
             draw_2D_configuration([nbr_node.x, nbr_node.y]);
             if(nbr_node.distance > current_node.distance + distance(current_node,nbr_node)){
