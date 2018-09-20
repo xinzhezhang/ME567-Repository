@@ -73,21 +73,21 @@ function init() {
 function initSearch() {
 
     // specify default search algorithm to use for planning
-    search_alg = "depth-first";  
+    // search_alg = "depth-first";  
     // search_alg = "breadth-first";  
-    //search_alg = "greedy-best-first";  
-    //search_alg = "A-star";  
+    search_alg = "greedy-best-first";  
+    // search_alg = "A-star";  
     //search_alg = "RRT";  
     //search_alg = "RRT-connect";  
     //search_alg = "RRT-star";  
 
     // specify default the world for the planner 
     //  (stored as "range" global variable with name "planning_scene")
-    //planning_scene = "empty";
-    // planning_scene = "misc";
-    planning_scene = "narrow1";
-    //planning_scene = "narrow2";
-    //planning_scene = "three_sections";
+    // planning_scene = "empty";
+    planning_scene = "misc";
+    // planning_scene = "narrow1";
+    // planning_scene = "narrow2";
+    // planning_scene = "three_sections";
 
 
 /////////////////////////
@@ -230,14 +230,18 @@ function animate() {
 
         // update iteration count
         search_iter_count++; 
-
+        
         // call iteration for the selected search algorithm
         switch (search_alg) {
             case "depth-first":
                 search_result = iterateGraphSearch();
                 break; 
-            case "breadth-first": 
+            case "breadth-first":
+                search_result = iterateGraphSearch();
+                break;  
             case "greedy-best-first": 
+                search_result = iterateGraphSearch();
+                break; 
             case "A-star": 
                 search_result = iterateGraphSearch();
                 break;
@@ -282,7 +286,7 @@ function animate() {
 
     // callback request for the animate function be called again
     //   more details online:  http://learningwebgl.com/blog/?p=3189
-    if(search_result == "succeeded"){
+    if(search_result == "succeeded" || search_iter_count>search_max_iterations){
         return;
     }
     requestAnimationFrame( animate );
@@ -311,7 +315,7 @@ function iterateGraphSearch() {
     }
 
     var current_node = pop(visit_queue);
-    if(isEqual(current_node.x,q_goal[0]) && isEqual(current_node.y,q_goal[1])){
+    if(isNear(current_node.x,q_goal[0]) && isNear(current_node.y,q_goal[1])){
         drawHighlightedPathGraph(current_node);
         return "succeeded";
     }
@@ -322,16 +326,18 @@ function iterateGraphSearch() {
         var jind_nbr = current_node.j + neighbor_order_ij[i][1];
         var nbr_node = G[iind_nbr][jind_nbr];
         if(!testCollision([nbr_node.x, nbr_node.y]) && !nbr_node.visited){
-            // console.warn('found neighbor');
+            console.warn('found neighbor');
+            draw_2D_configuration([nbr_node.x, nbr_node.y]);
+            var distance_to_curr = distance(current_node.x,current_node.y,nbr_node.x,nbr_node.y);
+            if(nbr_node.distance > current_node.distance + distance_to_curr){
+                nbr_node.distance = current_node.distance + distance_to_curr;
+                nbr_node.parent = current_node;
+                nbr_node.priority = fScore(nbr_node);
+            }
             if(!nbr_node.queued){
                 push(visit_queue,nbr_node);
             }
             nbr_node.queued = true;
-            draw_2D_configuration([nbr_node.x, nbr_node.y]);
-            if(nbr_node.distance > current_node.distance + distance(current_node,nbr_node)){
-                nbr_node.distance = current_node.distance + distance(current_node,nbr_node);
-                nbr_node.parent = current_node;
-            }
         }
     }
     return "iterating";
@@ -387,14 +393,14 @@ function iterateRRTStar() {
 //////////////////////////////////////////////////
 
 // distance calculation
-function distance(g1,g2){
+function distance(x1,y1,x2,y2){
     switch(distance_measure){
         case "Euclidean":
-            return (Math.sqrt(Math.pow(g1.x - g2.x,2) + Math.pow(g1.y - g2.y,2)))
+            return (Math.sqrt(Math.pow(x1 - x2,2) + Math.pow(y1 - y2,2)))
         case "Manhattan":
-            return (Math.abs(g1.x - g2.x) + Math.abs(g1.y - g2.y));
+            return (Math.abs(x1 - x2) + Math.abs(y1 - y2));
         case "Chebyshev":
-            return (Math.max(Math.abs(g1.x - g2.x) , Math.abs(g1.y - g2.y)));
+            return (Math.max(Math.abs(x1 - x2) , Math.abs(y1 - y2)));
         default:
             console.warn('distance method not found.');
             return 0;
@@ -405,6 +411,13 @@ function isEqual(a,b){
     return Math.abs(a-b)<0.000001;
 }
 
+function isNear(a,b){
+    return Math.abs(a-b)<eps/2;
+}
+
+function fScoreSmaller(g1,g2){
+    return (g1.priority<g2.priority);
+}
 // push operation for the visit list.
 // normal push for DFS and BFS
 // heap operation for A-star
@@ -412,17 +425,45 @@ function push(visit_queue,g){
     switch(search_alg){
         case "depth-first":
             visit_queue.push(g);
+            break;
         case "breadth-first":
             visit_queue.push(g);
+            break;
+        case "A-star":
+            minheap_insert(visit_queue,g,fScoreSmaller);
+            break;
+        case "greedy-best-first":
+            minheap_insert(visit_queue,g,fScoreSmaller);
+            break;
     }
 }
 
+// pop operation for the visit list.
+// pop for DFS, dequeue for BFS
+// heap operation for A-star
 function pop(visit_queue){
     switch(search_alg){
         case "depth-first":
             return visit_queue.pop();
         case "breadth-first":
             return visit_queue.shift();
+        case "A-star":
+            return minheap_extract(visit_queue,fScoreSmaller);
+        case "greedy-best-first":
+            return minheap_extract(visit_queue,fScoreSmaller);
+    }
+}
+
+function fScore(g){
+    switch(search_alg){
+        case "depth-first":
+            return -1;
+        case "breadth-first":
+            return -1;
+        case "A-star":
+            return (g.distance + distance(g.x,g.y,q_goal[0],q_goal[1]));
+        case "greedy-best-first":
+            return (distance(g.x,g.y,q_goal[0],q_goal[1]));
     }
 }
 
@@ -519,6 +560,7 @@ function initSearchGraph() {
             if(isEqual(xpos,q_init[0]) && isEqual(ypos,q_init[1])){
                 console.warn("find start");
                 G[iind][jind].distance = 0;
+                G[iind][jind].priority = fScore(G[iind][jind]);
                 push(visit_queue,G[iind][jind]);
             }
             //    visit_queue = [];
@@ -665,7 +707,62 @@ function insertTreeEdge(tree,q1_idx,q2_idx) {
 
     // STENCIL: implement min heap functions for graph search priority queue.
     //   These functions work use the 'priority' field for elements in graph.
+// minheaper = {}; 
+// swaps two elements in an array. Don't do any check 
+function swap(arr,first,second){
+    if(first == second){
+        return;
+    }
+    var temp = arr[first];
+    arr[first] = arr[second];
+    arr[second] = temp;
+    console.warn("swapped");
+}
+// define insert function for min binary heap
+function minheap_insert(heap, new_element, isSmaller) {
+    var length = heap.push(new_element);
+    var child = length - 1;
+    var parent = (child + child%2)/2 - 1;
+    while(parent >= 0 && isSmaller(heap[child], heap[parent])){
+        swap(heap,parent,child);
+        child = parent;
+        parent = (child + child%2)/2 - 1;
+    }
+    console.warn("inserted");
+}
 
+// assign insert function within minheaper object
+// minheaper.insert = minheap_insert;
+/* Note: because the minheap_insert function is an object, we can assign 
+      a reference to the function within the minheap object, which can be called
+      as minheap.insert
+*/
+
+// define extract function for min binary heap
+function minheap_extract(heap,isSmaller) {
+    swap(heap,0,heap.length - 1);
+    var to_pop = heap.pop();
+    var parent = 0;
+    var child = parent * 2 + 1;
+    while(child < heap.length){
+        if(child + 1 < heap.length && isSmaller(heap[child + 1], heap[child])){
+            child = child + 1;
+        }
+        if(isSmaller(heap[child], heap[parent])){
+            swap(heap,child,parent);
+            parent = child;
+            child = parent * 2 + 1; 
+        }
+        else{
+            break;
+        }
+    }
+    console.warn("extracted");
+    return to_pop;
+    // STENCIL: implement your min binary heap extract operation
+}
+
+// minheaper.extract = minheap_extract;
 
 
 //////////////////////////////////////////////////
