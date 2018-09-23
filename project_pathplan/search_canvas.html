@@ -328,8 +328,13 @@
                 search_iterate = false;
                 return "succeeded";
             }
-            current_node.visited = true;
-            search_visited++;
+            if (current_node.visited == false) {
+                current_node.visited = true;
+                search_visited++;
+            }
+            else {
+                return;
+            }
             for (var i = 0; i < 4; i++) {
                 var iind_nbr = current_node.i + neighbor_order_ij[i][0];
                 var jind_nbr = current_node.j + neighbor_order_ij[i][1];
