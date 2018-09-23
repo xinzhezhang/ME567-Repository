@@ -286,7 +286,7 @@ function animate() {
 
     // callback request for the animate function be called again
     //   more details online:  http://learningwebgl.com/blog/?p=3189
-    if(search_result == "succeeded" || search_iter_count>search_max_iterations){
+    if(search_result == "succeeded" ||search_result == "failed"|| search_iter_count>search_max_iterations){
         return;
     }
     requestAnimationFrame( animate );
