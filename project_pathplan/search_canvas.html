@@ -338,12 +338,14 @@
                     console.warn('found neighbor');
                     //draw_2D_configuration([nbr_node.x, nbr_node.y]);
                     var distance_to_curr = distance(current_node.x, current_node.y, nbr_node.x, nbr_node.y);
+                    var need_reheap = false;
                     if (nbr_node.distance > current_node.distance + distance_to_curr) {
                         nbr_node.distance = current_node.distance + distance_to_curr;
                         nbr_node.parent = current_node;
                         nbr_node.priority = fScore(nbr_node);
+                        need_reheap = true;
                     }
-                    if (!nbr_node.queued) {
+                    if (need_reheap) {
                         push(visit_queue, nbr_node);
                     }
                     nbr_node.queued = true;
