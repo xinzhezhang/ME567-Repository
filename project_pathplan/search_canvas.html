@@ -132,8 +132,8 @@
             };
 
             // specify start and goal configurations
-            q_start_config = [0, 0];
-            q_goal_config = [4, 4];
+            q_start_config = [5.0, 4];
+            q_goal_config = [0, -0.9];
             q_init = q_start_config;
             q_goal = q_goal_config;
 
@@ -326,6 +326,7 @@
             if (isNear(current_node.x, q_goal[0]) && isNear(current_node.y, q_goal[1])) {
                 drawHighlightedPathGraph(current_node);
                 search_iterate = false;
+                console.warn('distance=' + current_node.distance);
                 return "succeeded";
             }
             if (current_node.visited == false) {
@@ -343,7 +344,7 @@
                 }
                 var nbr_node = G[iind_nbr][jind_nbr];
                 if (!testCollision([nbr_node.x, nbr_node.y]) && !nbr_node.visited && nbr_node !== undefined) {
-                    console.warn('found neighbor');
+                    // console.warn('found neighbor');
                     //draw_2D_configuration([nbr_node.x, nbr_node.y]);
                     var distance_to_curr = distance(current_node.x, current_node.y, nbr_node.x, nbr_node.y);
                     var need_reheap = false;
@@ -744,7 +745,7 @@
             var temp = arr[first];
             arr[first] = arr[second];
             arr[second] = temp;
-            console.warn("swapped");
+            // console.warn("swapped");
         }
         // define insert function for min binary heap
         function minheap_insert(heap, new_element, isSmaller) {
@@ -756,7 +757,7 @@
                 child = parent;
                 parent = (child + child % 2) / 2 - 1;
             }
-            console.warn("inserted");
+            // console.warn("inserted");
         }
 
         // assign insert function within minheaper object

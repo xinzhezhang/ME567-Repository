@@ -1,29 +1,188 @@
 <!--
     Useful website for adding images: https://www.w3schools.com/html/html_images.asp
+
+    
 -->
 <html>
-    <h1>
-        Title
-    </h1>
-    <h2>
-        SubTitle
-    </h2>
-    <body style="text-align:center;margin-left:300;margin-right:300;font-size:30">
-        <p>
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
-            This is the first paragraph.This is the first paragraph.This is the first paragraph.
+<h1 style="text-align: center">
+    ME567 Assignment1: Path Planning
+</h1>
 
-        </p>
-        <img src = "Test_I_Mage.jpg" alt = "Test_I_Mage" width="500" height="600">
-        <p>
-            This is the second paragraph.
-        </p>
-            <img src = "Test_I_Mage.jpg" alt = "Test_I_Mage">  
-    </body>
+
+<body style="text-align:left;margin-left:300;margin-right:300;font-size:30">
+    <h2>
+        Results
+    </h2>
+    <p>
+        All the four methods are tested by the five map cases, and for each case the
+        start and goal pair are seleced as ([0,0],[4,4]) and ([4,4],[0,0]). The characteristics
+        of the methods can be analyzed from the two default settings for the start and goal.
+    </p>
+    <p>
+        The sections will be divided by methods, and for each method there will be ten figures.
+        Besides, an extra test for failed condition will be shown in the end.
+    </p>
+    <h3>
+        Depth First Search
+    </h3>
+    <p>
+        The following two figures are the result in empty map.
+    </p>
+    <img src="Figures/dfs_empty.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/dfs_empty_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in misc map.
+    </p>
+    <img src="Figures/dfs_misc.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/dfs_misc_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-1 map.
+    </p>
+    <img src="Figures/dfs_na1.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/dfs_na1_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-2 map.
+    </p>
+    <img src="Figures/dfs_na2.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/dfs_na2_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in three-sections map.
+    </p>
+    <img src="Figures/dfs_three.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/dfs_three_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        According to the result, the performance of DFS is highly related to the
+        visit order of neighbor points and the relative position between start and end.
+        If the visit order happens to be opposite to the goal direction, the DFS method will
+        visit more nodes and give a longer path. For all the conditions tested, DFS fails to
+        provide the optimal path to the goal.
+    </p>
+
+
+    <h3>
+        Breadth First Search
+    </h3>
+    <p>
+        The following two figures are the result in empty map.
+    </p>
+    <img src="Figures/bfs_empty.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/bfs_empty_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in misc map.
+    </p>
+    <img src="Figures/bfs_misc.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/bfs_misc_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-1 map.
+    </p>
+    <img src="Figures/bfs_na1.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/bfs_na1_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-2 map.
+    </p>
+    <img src="Figures/bfs_na2.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/bfs_na2_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in three-sections map.
+    </p>
+    <img src="Figures/bfs_three.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/bfs_three_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        For all the five maps, the BFS method gives an optimal path. The reason that BFS gives
+        an optimal result is that for this 2D world, the costs for each step are the same, and
+        the optimal path is not unique. If the start and goal are in differnet sections,
+        the iteration number depends on the relative position between the goal and the entrance
+        of that section.
+    </p>
+
+    <h3>
+        A Star
+    </h3>
+    <p>
+        The following two figures are the result in empty map.
+    </p>
+    <img src="Figures/astar_empty.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/astar_empty_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in misc map.
+    </p>
+    <img src="Figures/astar_misc.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/astar_misc_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-1 map.
+    </p>
+    <img src="Figures/astar_na1.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/astar_na1_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-2 map.
+    </p>
+    <img src="Figures/astar_na2.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/astar_na2_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in three-sections map.
+    </p>
+    <img src="Figures/astar_three.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/astar_three_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The A-star method gives optimal paths for all five maps because of the special
+        property of this 2D world definition.
+    </p>
+
+    <h3>
+        Greedy-Best-Search
+    </h3>
+    <p>
+        The following two figures are the result in empty map.
+    </p>
+    <img src="Figures/greedy_empty.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/greedy_empty_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in misc map.
+    </p>
+    <img src="Figures/greedy_misc.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/greedy_misc_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-1 map.
+    </p>
+    <img src="Figures/greedy_na1.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/greedy_na1_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in narrow-2 map.
+    </p>
+    <img src="Figures/greedy_na2.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/greedy_na2_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The following two figures are the result in three-sections map.
+    </p>
+    <img src="Figures/greedy_three.JPG" alt="Test_I_Mage" width="600" height="500">
+    <img src="Figures/greedy_three_rev.JPG" alt="Test_I_Mage" width="600" height="500">
+    <p>
+        The greedy-best search is the lest time consuming method among all the four, but
+        it will not always give the optimal path as A-star or BFS. The condition that greedy
+        will not give good result is: there is a wall between start and goal, and the way
+        to pass the wall is opposite to the goal direction. This happens on misc and narrow1 map.
+    </p>
+    <h3>
+        Failure and Boundary Test
+    </h3>
+    <p>
+        The test is done by setting start point at [-2,-2] which is the cornor of the world and
+        is outside the boundary, and goal inside the boundary so that it can't be reached. Result
+        is shown below:
+        <img src="Figures/fail_test.JPG" alt="Test_I_Mage" width="800" height="500">
+    </p>
+    <h2>
+        Conclusion
+    </h2>
+    <p>
+        Among all the four methods, DFS gives the worst path, but its performance is highly dependent
+        to the visit order. For a well selected order, DFS can be faster than BFS and doesn't need to
+        visit the entire space. BFS tends to visit the most of the section, so it is the most time
+        consuming. A-Star has a search direction to the goal, and it always takes less time than
+        BFS. Greedy-Best-Search is the most efficient method, but it will not always give the most optimal
+        path. It will not give the shortest path if the path is opposite to the goal direction, and in this
+        condition it will require more time to find the path.
+    </p>
+</body>
+
 </html>
